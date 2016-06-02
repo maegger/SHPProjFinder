@@ -1,3 +1,3 @@
 # SHPProjFinderDesktop
 
-Shapefile ProjectionFinder for Desktop.
+Shapefile ProjectionFinder for Desktop without use of projfinder.com 
