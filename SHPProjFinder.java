@@ -735,7 +735,8 @@ public class SHPProjFinder extends javax.swing.JFrame {
         bd = bd.setScale(places, RoundingMode.HALF_UP);
         return bd.doubleValue();
     }
-
+    // the code for this method is Licensed to Prodevelop SL
+    // look at http://www.programcreek.com/java-api-examples/index.php?class=org.geotools.referencing.CRS&method=decode
     public static double[] transform(String from, String to, double[] xy, double[] refCoord) {
         try {
             if (from == null || to == null) {
