@@ -1,6 +1,6 @@
 /*
  Copyright (c) 2016, Manfred Egger
- 
+ MORE INFO: https://github.com/maegger/SHPProjFinderDesktop/blob/master/LICENSE.md
  */
 package at.gis.egger;
 
