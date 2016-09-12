@@ -1,0 +1,1031 @@
+/*
+ /*
+ Copyright (c) 2016, Manfred Egger
+ MORE INFO: https://github.com/maegger/SHPProjFinderDesktop/blob/master/LICENSE.md
+ /*
+ Copyright (c) 2016, Manfred Egger
+ MORE INFO: https://github.com/maegger/SHPProjFinderDesktop/blob/master/LICENSE.md
+ */
+package at.gis.egger;
+
+import java.awt.Color;
+import java.awt.Desktop;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.util.Map;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Stream;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import org.geonames.Toponym;
+import org.geonames.ToponymSearchCriteria;
+import org.geonames.ToponymSearchResult;
+import org.geonames.WebService;
+import org.geotools.data.FeatureSource;
+
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.net.MalformedURLException;
+import java.util.HashMap;
+import javax.swing.JOptionPane;
+import org.opengis.referencing.operation.MathTransform;
+import org.geotools.geometry.DirectPosition2D;
+import java.net.URL;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.Set;
+import java.util.logging.LogManager;
+
+import org.geotools.data.FileDataStore;
+import org.geotools.data.FileDataStoreFinder;
+import org.geotools.map.DefaultMapContext;
+import org.geotools.map.event.MapBoundsEvent;
+import org.geotools.map.event.MapBoundsListener;
+
+import org.geotools.referencing.CRS;
+import org.geotools.swing.JMapFrame;
+import org.geotools.swing.JMapFrame.Tool;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.ProjectedCRS;
+
+public class SHPProjFinder extends javax.swing.JFrame {
+
+    static {
+        System.setProperty("org.geotools.referencing.forceXY", "true");
+    }
+    public File shapeToTest = null;
+    public static HashMap<Integer, String> listOfProjs = null;
+    public static HashMap<String, Double> distListMap = null;
+    public static Object[] prjList = null;
+    public static double[] incoord = null;
+    public static double[] refCoord = null;
+
+    public SHPProjFinder() throws MalformedURLException, IOException {
+        JOptionPane.setDefaultLocale(Locale.ENGLISH);
+        /*Set<String> epsg_codes = CRS.getSupportedCodes("EPSG");
+         int u = 0;
+         for (Iterator<String> iterator = epsg_codes.iterator(); iterator.hasNext();) {
+         String next = iterator.next();
+         try {
+         CoordinateReferenceSystem from_crs = CRS.decode("EPSG:"+next);
+         ProjectedCRS projectedCRS = CRS.getProjectedCRS(from_crs);
+         String ut = projectedCRS.getName() + "";
+         System.out.println(next);
+         u++;
+         } catch (Exception ex) {
+               
+         //Logger.getLogger(SHPProjFinder.class.getName()).log(Level.SEVERE, null, ex);
+         }
+
+         }
+         */
+        //JOptionPane.showMessageDialog(this, " This is a reduced edition which included only EPSG-Codes of Austria, Germany and Switzerland registered on spatialreference.org. \nAfter FOSS4G 2016 in Bonn i will add all worldwide registered EPSG-Codes to SHAPEFILE PROJECTIONFINDER.\n\nIMPORTANT: This tool includes only projected coordinate reference systems. So please do not load shapefiles with LON/LAT coordinates.");
+        distListMap = new HashMap<String, Double>();
+        listOfProjs = new HashMap<Integer, String>();
+        String epsg_list = "https://raw.githubusercontent.com/maegger/SHPProjFinder/master/epsg_geotools.txt";
+        //epsg_list = "https://raw.githubusercontent.com/maegger/SHPProjFinder/master/epsg.txt";
+        //epsg_list = "https://u.jimcdn.com/e/o/sf87ce702d2eb2f53/userlayout/js/epsg-list-oi.js?t=1468518229";
+//File url = new File(epsg_list);
+        URL url = new URL(epsg_list);
+
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(url.openStream()));
+
+        String inputLine;
+        while ((inputLine = in.readLine()) != null) //System.out.println(inputLine);
+        {
+
+            listOfProjs.put(Integer.parseInt(inputLine.split(":")[1]), inputLine.trim());
+
+        }
+        in.close();
+        prjList = listOfProjs.values().toArray();
+
+        setAlwaysOnTop(true);
+        initComponents();
+        setAlwaysOnTop(false);
+
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     *
+     *
+     */
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        jTextField1 = new javax.swing.JTextField();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        button1 = new java.awt.Button();
+        choice1 = new java.awt.Choice();
+        button2 = new java.awt.Button();
+        textField1 = new java.awt.TextField();
+        textField2 = new java.awt.TextField();
+        textField3 = new java.awt.TextField();
+        textField4 = new java.awt.TextField();
+        label1 = new java.awt.Label();
+        label2 = new java.awt.Label();
+        label3 = new java.awt.Label();
+        label4 = new java.awt.Label();
+        label5 = new java.awt.Label();
+        button3 = new java.awt.Button();
+        list1 = new java.awt.List();
+        button4 = new java.awt.Button();
+        label7 = new java.awt.Label();
+        label8 = new java.awt.Label();
+        label9 = new java.awt.Label();
+        label11 = new java.awt.Label();
+        label12 = new java.awt.Label();
+        jLabel3 = new javax.swing.JLabel();
+        panel1 = new java.awt.Panel();
+        label15 = new java.awt.Label();
+        label13 = new java.awt.Label();
+        textField6 = new java.awt.TextField();
+        textField5 = new java.awt.TextField();
+        button6 = new java.awt.Button();
+        label16 = new java.awt.Label();
+        label17 = new java.awt.Label();
+        label19 = new java.awt.Label();
+        label20 = new java.awt.Label();
+        label21 = new java.awt.Label();
+        label22 = new java.awt.Label();
+        filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(500, 0), new java.awt.Dimension(500, 0), new java.awt.Dimension(500, 32767));
+        jLabel4 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        textField7 = new java.awt.TextField();
+        label23 = new java.awt.Label();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Shapefile ProjectionFinder Version 1.0.0");
+        setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        setLocationByPlatform(true);
+        setPreferredSize(new java.awt.Dimension(870, 570));
+        setResizable(false);
+        setSize(new java.awt.Dimension(870, 570));
+
+        jLabel1.setFont(new java.awt.Font("Arial", 1, 10)); // NOI18N
+        jLabel1.setText("Write geoname, then press Find:");
+
+        jLabel2.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
+        jLabel2.setText("Shapefile ProjectionFinder");
+
+        button1.setLabel("Find");
+        button1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                getGeoNames(evt);
+            }
+        });
+
+        choice1.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                choice1ItemStateChanged(evt);
+            }
+        });
+
+        button2.setLabel("Select Shapefile");
+        button2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                selectShapefile(evt);
+            }
+        });
+
+        textField1.setText("-");
+        textField1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                textField1ActionPerformed(evt);
+            }
+        });
+
+        textField2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                textField2ActionPerformed(evt);
+            }
+        });
+
+        textField3.setText("-");
+        textField3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                textField3ActionPerformed(evt);
+            }
+        });
+
+        textField4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                textField4ActionPerformed(evt);
+            }
+        });
+
+        label1.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        label1.setText("WIDTH:");
+
+        label2.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        label2.setText("X:");
+
+        label3.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        label3.setText("Y:");
+
+        label4.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        label4.setText("HEIGHT:");
+
+        label5.setFont(new java.awt.Font("Arial", 1, 10)); // NOI18N
+        label5.setText("If you have no shapefile, write a unkown coordinate with hand into X / Y fields:");
+
+        button3.setEnabled(false);
+        button3.setLabel("Search possible projections");
+        button3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                getProjectionList(evt);
+            }
+        });
+
+        list1.setMultipleMode(true);
+        list1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                list1ActionPerformed(evt);
+            }
+        });
+
+        button4.setEnabled(false);
+        button4.setLabel("Start");
+        button4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                makeCopiesOfShapes(evt);
+            }
+        });
+
+        label7.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        label7.setText("FIRST HELP:");
+
+        label8.setFont(new java.awt.Font("Arial", 1, 10)); // NOI18N
+        label8.setText("- http://geotools.org/ 2.6.0");
+
+        label9.setFont(new java.awt.Font("Arial", 1, 10)); // NOI18N
+        label9.setText("- http://geonames.org");
+
+        label11.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        label11.setText("This application uses:");
+
+        label12.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        label12.setText("Copyright: Manfred Egger, 2016                    Web: www.egger-gis.at");
+
+        jLabel3.setFont(new java.awt.Font("Tahoma", 1, 10)); // NOI18N
+        jLabel3.setText("Sorted list below shows the distance of the shapefiles coordinates to the LAT/LON values above.");
+
+        panel1.setBackground(new java.awt.Color(204, 255, 255));
+
+        label15.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        label15.setText("LAT:");
+
+        label13.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        label13.setText("LON:");
+
+        textField6.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                textField6MouseClicked(evt);
+            }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                textField6MousePressed(evt);
+            }
+        });
+        textField6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                textField6ActionPerformed(evt);
+            }
+        });
+        textField6.addTextListener(new java.awt.event.TextListener() {
+            public void textValueChanged(java.awt.event.TextEvent evt) {
+                textField6TextValueChanged(evt);
+            }
+        });
+
+        textField5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                textField5ActionPerformed(evt);
+            }
+        });
+        textField5.addTextListener(new java.awt.event.TextListener() {
+            public void textValueChanged(java.awt.event.TextEvent evt) {
+                textField5TextValueChanged(evt);
+            }
+        });
+
+        org.jdesktop.layout.GroupLayout panel1Layout = new org.jdesktop.layout.GroupLayout(panel1);
+        panel1.setLayout(panel1Layout);
+        panel1Layout.setHorizontalGroup(
+            panel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, panel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .add(label15, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(textField5, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 104, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .add(label13, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(textField6, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 104, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(23, 23, 23))
+        );
+        panel1Layout.setVerticalGroup(
+            panel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(panel1Layout.createSequentialGroup()
+                .add(panel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(panel1Layout.createSequentialGroup()
+                        .add(19, 19, 19)
+                        .add(panel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(label13, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(label15, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(textField5, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                    .add(panel1Layout.createSequentialGroup()
+                        .add(18, 18, 18)
+                        .add(textField6, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        button6.setLabel("MORE INFO&HELP");
+        button6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                button6selectShapefile(evt);
+            }
+        });
+
+        label16.setFont(new java.awt.Font("Arial", 1, 10)); // NOI18N
+        label16.setText("In your gis project you can add all shapefile copies and visually check which EPSG-Code is correct. Only projected coordinate system are analysed.");
+
+        label17.setFont(new java.awt.Font("Arial", 1, 10)); // NOI18N
+        label17.setText("If you find DISTVALUES with similar values and you don't know the correct projection. I recommend to select two or more rows in the list. ");
+
+        label19.setFont(new java.awt.Font("Arial", 1, 10)); // NOI18N
+        label19.setText("- The Austrian Service for Torrent and Avalanche Control, 2016.");
+
+        label20.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        label20.setText("Basing idea behind this tool was developed by:");
+
+        label21.setFont(new java.awt.Font("Arial", 1, 10)); // NOI18N
+        label21.setText("- Aaron Racicot (www.projfinder.com), 2013.");
+
+        label22.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        label22.setText("Make copies of shapefile with .prj-File for each selected projection:");
+
+        jLabel4.setText("Select location/place near the selected X/Y coordinates to get LAT/LON values or write LAT/LON values in the textfields below:");
+
+        jLabel5.setFont(new java.awt.Font("Tahoma", 1, 10)); // NOI18N
+        jLabel5.setText("Count of listet DISTVALUES:");
+
+        textField7.setText("5");
+        textField7.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                textField7MouseClicked(evt);
+            }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                textField7MousePressed(evt);
+            }
+        });
+        textField7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                textField7ActionPerformed(evt);
+            }
+        });
+        textField7.addTextListener(new java.awt.event.TextListener() {
+            public void textValueChanged(java.awt.event.TextEvent evt) {
+                textField7TextValueChanged(evt);
+            }
+        });
+
+        label23.setFont(new java.awt.Font("Arial", 1, 10)); // NOI18N
+        label23.setText("- Manfred Egger, 2016.");
+
+        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(layout.createSequentialGroup()
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                        .addContainerGap()
+                        .add(jLabel2)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(label3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(label2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                            .add(textField4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 66, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(textField2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 66, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .add(24, 24, 24)
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(label1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(label4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                            .add(textField1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 66, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(textField3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 66, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                    .add(layout.createSequentialGroup()
+                        .add(14, 14, 14)
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                            .add(layout.createSequentialGroup()
+                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                                    .add(layout.createSequentialGroup()
+                                        .add(jLabel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 162, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                                        .add(jTextField1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 202, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                        .add(button1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                                    .add(choice1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 424, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .add(panel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                            .add(layout.createSequentialGroup()
+                                .add(label7, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(label17, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                            .add(layout.createSequentialGroup()
+                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                    .add(layout.createSequentialGroup()
+                                        .add(button3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                        .add(jLabel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 497, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
+                                        .add(org.jdesktop.layout.GroupLayout.LEADING, list1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
+                                            .add(label22, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                            .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                            .add(button4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 265, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))))
+                                .add(18, 18, 18)
+                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                    .add(jLabel5)
+                                    .add(textField7, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 142, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                            .add(label16, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(layout.createSequentialGroup()
+                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                    .add(label19, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 322, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                    .add(label21, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 308, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .add(label12, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 181, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                            .add(layout.createSequentialGroup()
+                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                    .add(label20, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                    .add(label23, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 322, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                                .add(335, 335, 335)
+                                .add(button6, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
+                .addContainerGap(11, Short.MAX_VALUE))
+            .add(layout.createSequentialGroup()
+                .addContainerGap()
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(layout.createSequentialGroup()
+                        .add(button2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                                .add(0, 0, Short.MAX_VALUE)
+                                .add(filler1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 321, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                            .add(layout.createSequentialGroup()
+                                .add(label5, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 399, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .add(0, 0, Short.MAX_VALUE)))
+                        .add(170, 170, 170))
+                    .add(layout.createSequentialGroup()
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(layout.createSequentialGroup()
+                                .add(393, 393, 393)
+                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                    .add(label8, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                    .add(label11, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                    .add(label9, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                            .add(jLabel4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 733, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(layout.createSequentialGroup()
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(layout.createSequentialGroup()
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                .add(textField4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .add(org.jdesktop.layout.GroupLayout.TRAILING, label2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                            .add(layout.createSequentialGroup()
+                                .add(1, 1, 1)
+                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                    .add(textField1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                    .add(label1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))))
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(textField3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(label4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(label3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(textField2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                    .add(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .add(jLabel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 23, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                            .add(label5, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(button2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .add(jLabel4)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                    .add(layout.createSequentialGroup()
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                            .add(button1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                                .add(jTextField1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .add(jLabel1)))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .add(choice1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(panel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(29, 29, 29)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(button3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                        .add(jLabel3)
+                        .add(jLabel5)))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(textField7, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(list1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 123, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(label22, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(button4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(label7, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(label17, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(0, 0, 0)
+                .add(label16, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(layout.createSequentialGroup()
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(layout.createSequentialGroup()
+                                .add(label20, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .add(0, 0, 0)
+                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                                    .add(label9, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                    .add(label23, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                            .add(label11, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .add(0, 0, 0)
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(label19, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(label8, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .add(0, 0, 0)
+                        .add(label21, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(layout.createSequentialGroup()
+                        .add(button6, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 41, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(label12, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                .add(0, 0, 0)
+                .add(filler1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 9, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+        );
+
+        label2.getAccessibleContext().setAccessibleName("x:");
+        label5.getAccessibleContext().setAccessibleName("If you have nor Shapefile, write a unknow ccordinate in X and Y fields.");
+        label8.getAccessibleContext().setAccessibleName("- http://geotools.org/ (2.7.0)");
+        label11.getAccessibleContext().setAccessibleDescription("");
+        label12.getAccessibleContext().setAccessibleName("Contact: manfred@egger-gis.at                                                                                                            ");
+        label19.getAccessibleContext().setAccessibleName("Basing idea behind this tool was developed by :");
+        label20.getAccessibleContext().setAccessibleName("Basing idea of this tool was published by:");
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void getGeoNames(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_getGeoNames
+        choice1.removeAll();
+
+        WebService.setUserName("manfredegger"); // add your username here
+
+        ToponymSearchCriteria searchCriteria = new ToponymSearchCriteria();
+
+        searchCriteria.setQ(jTextField1.getText());
+        ToponymSearchResult searchResult = null;
+        try {
+            //Request to geonames...
+            searchResult = WebService.search(searchCriteria);
+        } catch (Exception ex) {
+            Logger.getLogger(SHPProjFinder.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        //get List of geoNames with LON/LAT values
+        int u = 0;
+        for (Toponym toponym : searchResult.getToponyms()) {
+            if (u == 0 && (toponym.getName().toLowerCase().contains(jTextField1.getText().toLowerCase()) && toponym.getFeatureClass().name().toLowerCase().equals("P".toLowerCase()))) {
+                textField6.setText("" + toponym.getLongitude());
+                textField5.setText("" + toponym.getLatitude());
+                u++;
+            }
+            if (toponym.getName().toLowerCase().contains(jTextField1.getText().toLowerCase()) && toponym.getFeatureClass().name().toLowerCase().equals("P".toLowerCase())) {
+                choice1.add(toponym.getName() + " LAT: " + toponym.getLatitude() + " LON: " + toponym.getLongitude());
+
+            }
+
+        }
+
+    }//GEN-LAST:event_getGeoNames
+    public static void openWebpage(URI uri) {
+        Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
+        if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
+            try {
+                desktop.browse(uri);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    private void selectShapefile(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectShapefile
+        try {
+            choice1.removeAll();
+            list1.removeAll();
+            textField6.setText("-");
+            textField5.setText("-");
+            jTextField1.setText("");
+            JFileChooser fc = new JFileChooser();
+            fc.setFileFilter(new FileNameExtensionFilter("Shapefile", "shp"));
+            fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            fc.setMultiSelectionEnabled(false);
+            fc.setDialogTitle("Please select a Shapefile...");
+            int ergebnis = 0;
+
+            ergebnis = fc.showOpenDialog(null);
+
+            if (ergebnis == JFileChooser.APPROVE_OPTION) {
+                label5.setText("Extent and centre of Shapefile coordinates are loaded...");
+                label5.setForeground(Color.red);
+                shapeToTest = fc.getSelectedFile();
+                Map<String, URL> map = new HashMap<String, URL>();
+
+                map.put("url", shapeToTest.toURI().toURL());
+
+                FileDataStore store = FileDataStoreFinder.getDataStore(shapeToTest);
+                FeatureSource<SimpleFeatureType, SimpleFeature> featureSource = store.getFeatureSource();
+                //INIT Transformation
+                incoord = new double[2];
+                incoord[0] = 13;
+                incoord[1] = 47;
+                refCoord = new double[2];
+                refCoord[0] = 43254;
+                refCoord[1] = 32653;
+                double[] coord = transform("EPSG:4236", "EPSG:32632", incoord, refCoord);
+
+                label5.setForeground(Color.black);
+                label5.setText(shapeToTest.getName());
+                textField4.setText("" + ((int) featureSource.getBounds().getMinX() + ((int) featureSource.getBounds().getWidth() / 2)));
+                textField3.setText("" + (int) featureSource.getBounds().getHeight());
+                textField2.setText("" + ((int) featureSource.getBounds().getMinY() + ((int) featureSource.getBounds().getHeight() / 2)));
+                textField1.setText("" + (int) featureSource.getBounds().getWidth());
+                //button5.enable(true);
+
+                label5.setText(shapeToTest.getName());
+
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(SHPProjFinder.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_selectShapefile
+
+    private void textField3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textField3ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_textField3ActionPerformed
+
+    private void textField4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textField4ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_textField4ActionPerformed
+
+    private void getProjectionList(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_getProjectionList
+        list1.removeAll();
+        int listcount = Integer.parseInt(textField7.getText()) - 1;
+        String sourceCRS = "EPSG:4236";
+        distListMap.clear();
+        incoord = new double[2];
+        incoord[0] = Double.parseDouble(textField6.getText());
+        incoord[1] = Double.parseDouble(textField5.getText());
+        if ((incoord[0] > -180 & incoord[0] < 180) && (incoord[1] > -90 & incoord[1] < 90)) {
+            list1.add("WAIT... All possible projections are analysed.");
+            refCoord = new double[2];
+            refCoord[0] = Integer.parseInt(textField4.getText());
+            refCoord[1] = Integer.parseInt(textField2.getText());
+            for (int l = 0; l < prjList.length; l++) {
+                double[] coord = transform(sourceCRS, (String) prjList[l], incoord, refCoord);
+                //System.out.println(coord[2]);
+                if (coord != null) {
+                    System.out.println((String) prjList[l]);
+                    distListMap.put((String) prjList[l], coord[2]);
+
+                }
+            }
+            Map<String, Double> sortedMapAsc = SortMapByValue.sortByComparator(distListMap, SortMapByValue.ASC);
+            //JOptionPane.showMessageDialog(rootPane, sortedMapAsc.size() + " " + prjList.length);
+            list1.removeAll();
+            Object[] distList = sortedMapAsc.keySet().toArray();
+            for (int l = 0; l < distList.length; l++) {
+                double dist = round(sortedMapAsc.get(distList[l]), 2);
+                String bet = "";
+                //JOptionPane.showMessageDialog(rootPane, distList[l].toString().length());
+                if (distList[l].toString().length() < 10) {
+                    bet = "  ";
+                }
+                list1.add(distList[l] + bet + " DIST:" + dist);
+                if (l == listcount) {
+                    break;
+                }
+            }
+            if (!label5.getText().startsWith("If you have no shapefile, write a unkown coordinate with hand into X / Y field")) {
+                button4.enable(true);
+            } else{
+                 JOptionPane.showMessageDialog(this, "You have not selected a shapefile. \n\nIn this case you can only view possible coordinate system for in list and use this information in other gis systems/formats.");
+            }
+                    
+            //JOptionPane.showMessageDialog(this, "If you find DISTVALUES with similar values and you don't know the correct projection. I recommend to select two or more rows in the list. \n\nSHAPEFILE PROJECTIONFINDER will make for each selected row a copy of the shapefile.\n\nIn your gis project you can add all shapefile copies and visually check which EPSG-Code is correct.\n\nDon`t forget: Sometimes you have to add a transformation-defintion to your gis project. ");
+        } else {
+            JOptionPane.showMessageDialog(this, "The LON/LAT value is not valid. Please use another LON/LAT value.");
+        }
+    }//GEN-LAST:event_getProjectionList
+
+    private void makeCopiesOfShapes(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_makeCopiesOfShapes
+        //get WKT from spatialreference.com for prj-Files
+
+        if (list1.getSelectedItems().length > 0) {
+
+            int eingabe = JOptionPane.showConfirmDialog(null,
+                    list1.getSelectedItems().length + " EPSG-Codes are selected. Do you want to make a copy for each selected item?",
+                    "OK?",
+                    JOptionPane.YES_NO_OPTION);
+            if (eingabe == 0) {
+                try {
+                    String[] itemlist = list1.getSelectedItems();
+                    for (String sel : itemlist) {
+                        String epsg = sel.split(" DIST")[0];
+                        epsg = epsg.split(":")[1];
+                        File order = new File(shapeToTest.getParent());
+                        File[] orderOfShape = order.listFiles();
+                        String basename = shapeToTest.getName().split(".shp")[0] + ".";
+                        for (File f : orderOfShape) {
+                            if (f.isFile() && f.getName().startsWith(basename)) {
+                                copyFileUsingStream(f, new File(f.getParent() + "//" + epsg + "_" + f.getName()));
+                            }
+                        }
+
+                        //String url = "http://www.epsg-registry.org/export.htm?wkt=urn:ogc:def:crs:EPSG::" + epsg.trim();
+                        //String url = "http://spatialreference.org/ref/epsg/" + epsg.trim() + "/esriwkt/";
+                        /*
+                         BufferedReader input = new BufferedReader(new InputStreamReader(new URL(url).openStream(), "UTF-8"));
+                         Stream<String> list = input.lines();
+                         JOptionPane.showMessageDialog(rootPane, input.toString());
+                         Object[] findFirst = list.toArray();
+                         */
+                        PrintWriter writer = new PrintWriter(shapeToTest.getParent() + "//" + epsg + "_" + shapeToTest.getName().replace(".shp", ".prj"), "UTF-8");
+                        CoordinateReferenceSystem crs = CRS.decode("EPSG:" + epsg.trim());
+                        System.out.println(crs.toWKT());
+                        writer.print(crs.toWKT());
+                        writer.close();
+                    }
+                    JOptionPane.showMessageDialog(this, "Finished. You find the copies in the folder of the input Shapefile.\n\nThe filenames of the shapefiles start with their EPSG-Codes.\nIMPORTANT:\nCheck visually in your GIS-Project, if the position of the shapefile copy is correct.\nIf the postion is not correct: Maybe the coordinane system is unkown to epsg database used by geotools 2.7.0. or \nyou have not added a transformation-defintion to your gis project.");
+                } catch (Exception ex) {
+                    Logger.getLogger(SHPProjFinder.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "NO item in projection list is selected. Please select one or more item.");
+        }
+
+    }//GEN-LAST:event_makeCopiesOfShapes
+
+    private void textField5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textField5ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_textField5ActionPerformed
+
+    private void textField6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textField6ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_textField6ActionPerformed
+
+    private void choice1ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_choice1ItemStateChanged
+        textField6.setText(choice1.getSelectedItem().split("LON: ")[1]);
+        textField5.setText(choice1.getSelectedItem().split("LAT:")[1].trim().split("LON")[0].trim());
+    }//GEN-LAST:event_choice1ItemStateChanged
+
+    private void textField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textField1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_textField1ActionPerformed
+
+    private void textField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textField2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_textField2ActionPerformed
+
+    private void textField6TextValueChanged(java.awt.event.TextEvent evt) {//GEN-FIRST:event_textField6TextValueChanged
+        button3.enable(true);
+        list1.removeAll();
+    }//GEN-LAST:event_textField6TextValueChanged
+
+    private void button6selectShapefile(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button6selectShapefile
+        try {
+            openWebpage(new URI("http://www.egger-gis.at/shapefile-projectionfinder/"));
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(SHPProjFinder.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_button6selectShapefile
+
+    private void textField5TextValueChanged(java.awt.event.TextEvent evt) {//GEN-FIRST:event_textField5TextValueChanged
+        list1.removeAll();
+    }//GEN-LAST:event_textField5TextValueChanged
+
+    private void list1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_list1ActionPerformed
+
+    }//GEN-LAST:event_list1ActionPerformed
+
+    private void textField6MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_textField6MouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_textField6MouseClicked
+
+    private void textField6MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_textField6MousePressed
+
+    }//GEN-LAST:event_textField6MousePressed
+
+    private void textField7MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_textField7MouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_textField7MouseClicked
+
+    private void textField7MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_textField7MousePressed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_textField7MousePressed
+
+    private void textField7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textField7ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_textField7ActionPerformed
+
+    private void textField7TextValueChanged(java.awt.event.TextEvent evt) {//GEN-FIRST:event_textField7TextValueChanged
+        // TODO add your handling code here:
+    }//GEN-LAST:event_textField7TextValueChanged
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+
+        LogManager.getLogManager().reset();
+        Logger globalLogger = Logger.getLogger(java.util.logging.Logger.GLOBAL_LOGGER_NAME);
+        globalLogger.setLevel(java.util.logging.Level.OFF);
+
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    new SHPProjFinder().setVisible(true);
+                } catch (IOException ex) {
+                    Logger.getLogger(SHPProjFinder.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+    }
+
+    public static void copyFileUsingStream(File source, File dest) throws IOException {
+        InputStream is = null;
+        OutputStream os = null;
+        try {
+            is = new FileInputStream(source);
+            os = new FileOutputStream(dest);
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = is.read(buffer)) > 0) {
+                os.write(buffer, 0, length);
+            }
+        } finally {
+            is.close();
+            os.close();
+        }
+    }
+
+    public static double round(double value, int places) {
+        if (places < 0) {
+            throw new IllegalArgumentException();
+        }
+        BigDecimal bd = new BigDecimal(value);
+        bd = bd.setScale(places, RoundingMode.HALF_UP);
+        return bd.doubleValue();
+    }
+
+    // the code for this method transform is Licensed to Prodevelop SL
+    // look at http://www.programcreek.com/java-api-examples/index.php?class=org.geotools.referencing.CRS&method=decode
+    public static double[] transform(String from, String to, double[] xy, double[] refCoord) {
+        try {
+            if (from == null || to == null) {
+                return xy;
+            }
+
+            if (from.compareToIgnoreCase("EPSG:4326") == 0) {
+                // E6 support 
+                if (xy[0] > 181 || xy[0] < -181) {
+                    xy[0] /= 1000000;
+                }
+                if (xy[1] > 91 || xy[1] < -91) {
+                    xy[1] /= 1000000;
+                }
+            }
+
+            if (from.equals(to)) {
+                return xy;
+            }
+
+            CoordinateReferenceSystem from_crs = CRS.decode(from);
+
+            // The 'true' means: 
+            // "I'm going to use the order (longitude, latitude)" 
+            //CoordinateReferenceSystem to_crs = CRS.parseWKT(to)decode(to, true);
+            //String url = "http://www.epsg-registry.org/export.htm?wkt=urn:ogc:def:crs:EPSG::" + to.split(":")[1];
+            //String url = "http://spatialreference.org/ref/epsg/" + epsg.trim() + "/esriwkt/";
+            //BufferedReader input = new BufferedReader(new InputStreamReader(new URL(url).openStream(), "UTF-8"));
+            //Stream<String> list = input.lines();
+            //Object[] findFirst = list.toArray();
+            //String wkt = "";
+            //for (Object ele : findFirst) {
+            //   wkt = wkt + " " + (String) ele;
+            //}
+            //System.out.println(wkt);
+            //CoordinateReferenceSystem to_crs = CRS.parseWKT(wkt);
+            CoordinateReferenceSystem to_crs = CRS.decode(to);
+
+            //System.out.println(to_crs.getName());
+            // The 'false' means: 
+            // "There will be an exception if Geotools doesn't know how to do it" 
+            MathTransform transform = CRS.findMathTransform(from_crs, to_crs,
+                    true);
+
+            DirectPosition2D from_point = new DirectPosition2D(xy[0], xy[1]);
+            DirectPosition2D to_point = new DirectPosition2D(0, 0);
+            transform.transform(from_point, to_point);
+
+            double dist = Math.sqrt(
+                    (to_point.x - refCoord[0]) * (to_point.x - refCoord[0])
+                    + (to_point.y - refCoord[1]) * (to_point.y - refCoord[1])
+            );
+
+            //return new double[]{from_point.x, from_point.y, dist};
+            return new double[]{to_point.x, to_point.y, dist};
+
+        } catch (Exception exc) {
+            //exc.printStackTrace();
+
+            return null;
+        }
+
+    }
+
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private java.awt.Button button1;
+    private java.awt.Button button2;
+    private java.awt.Button button3;
+    private java.awt.Button button4;
+    private java.awt.Button button6;
+    private java.awt.Choice choice1;
+    private javax.swing.Box.Filler filler1;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JTextField jTextField1;
+    private java.awt.Label label1;
+    private java.awt.Label label11;
+    private java.awt.Label label12;
+    private java.awt.Label label13;
+    private java.awt.Label label15;
+    private java.awt.Label label16;
+    private java.awt.Label label17;
+    private java.awt.Label label19;
+    private java.awt.Label label2;
+    private java.awt.Label label20;
+    private java.awt.Label label21;
+    private java.awt.Label label22;
+    private java.awt.Label label23;
+    private java.awt.Label label3;
+    private java.awt.Label label4;
+    private java.awt.Label label5;
+    private java.awt.Label label7;
+    private java.awt.Label label8;
+    private java.awt.Label label9;
+    private java.awt.List list1;
+    private java.awt.Panel panel1;
+    private java.awt.TextField textField1;
+    private java.awt.TextField textField2;
+    private java.awt.TextField textField3;
+    private java.awt.TextField textField4;
+    private java.awt.TextField textField5;
+    private java.awt.TextField textField6;
+    private java.awt.TextField textField7;
+    // End of variables declaration//GEN-END:variables
+
+}
