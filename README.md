@@ -7,3 +7,5 @@ Here you get the repository of this link:
 
 http://www.egger-gis.at/app/download/13477352296/SHPProjFinder.zip?t=1475294181
 
+SHPProjFinderDesktop is using this library: https://github.com/geotools/geotools
+
